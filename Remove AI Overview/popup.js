@@ -1,15 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const toggle = document.getElementById("toggle");
+    const toggleGoogle = document.getElementById("toggle-google");
+    const toggleYouTube = document.getElementById("toggle-youtube");
 
-    // Load and set the initial state of the toggle
-    chrome.storage.sync.get("enabled", (data) => {
-        // Default to enabled if no value exists
-        const isEnabled = data.enabled ?? true;
-        toggle.checked = isEnabled;
+    // Load and set the initial state of the toggle for Google
+    chrome.storage.sync.get("enabledGoogle", (data) => {
+        const isEnabledGoogle = data.enabledGoogle ?? true; // Default to true if not found
+        toggleGoogle.checked = isEnabledGoogle;
 
-        // Save the default state if no value exists in storage
-        if (data.enabled === undefined) {
-            chrome.storage.sync.set({ enabled: true }, () => {
+        // Save the default state for Google if not set
+        if (data.enabledGoogle === undefined) {
+            chrome.storage.sync.set({ enabledGoogle: true }, () => {
                 if (chrome.runtime.lastError) {
                     console.error(chrome.runtime.lastError);
                 }
@@ -17,19 +17,48 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Add event listener to update state on toggle
-    toggle.addEventListener("change", () => {
-        const isEnabled = toggle.checked;
-        chrome.storage.sync.set({ enabled: isEnabled }, () => {
+    // Load and set the initial state of the toggle for YouTube
+    chrome.storage.sync.get("enabledYouTube", (data) => {
+        const isEnabledYouTube = data.enabledYouTube ?? true; // Default to true if not found
+        toggleYouTube.checked = isEnabledYouTube;
+
+        // Save the default state for YouTube if not set
+        if (data.enabledYouTube === undefined) {
+            chrome.storage.sync.set({ enabledYouTube: true }, () => {
+                if (chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError);
+                }
+            });
+        }
+    });
+
+    // Add event listener to update Google state on toggle
+    toggleGoogle.addEventListener("change", () => {
+        const isGoogleEnabled = toggleGoogle.checked;
+        chrome.storage.sync.set({ enabledGoogle: isGoogleEnabled }, () => {
             if (chrome.runtime.lastError) {
                 console.error(chrome.runtime.lastError);
                 return;
             }
-            console.log(`Extension enabled state set to: ${isEnabled}`);
+            console.log(`Google extension enabled state set to: ${isGoogleEnabled}`);
         });
 
-        // Notify content or background scripts about the change
-        chrome.runtime.sendMessage({ action: "toggle", enabled: isEnabled });
+        // Notify background script about the change for Google
+        chrome.runtime.sendMessage({ action: "toggleGoogle", enabled: isGoogleEnabled });
+    });
+
+    // Add event listener to update YouTube state on toggle
+    toggleYouTube.addEventListener("change", () => {
+        const isYouTubeEnabled = toggleYouTube.checked;
+        chrome.storage.sync.set({ enabledYouTube: isYouTubeEnabled }, () => {
+            if (chrome.runtime.lastError) {
+                console.error(chrome.runtime.lastError);
+                return;
+            }
+            console.log(`YouTube extension enabled state set to: ${isYouTubeEnabled}`);
+        });
+
+        // Notify background script about the change for YouTube
+        chrome.runtime.sendMessage({ action: "toggleYouTube", enabled: isYouTubeEnabled });
     });
 });
-

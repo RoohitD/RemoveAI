@@ -5,18 +5,22 @@
   "description": "Removes the AI overview section from Google search results.",
   "permissions": [
     "scripting",
-    "storage"
+    "storage",
+    "https://www.google.com/*",
+    "https://www.youtube.com/*"
   ],
   "action": {
     "default_popup": "popup.html"
   },
   "host_permissions": [
-    "https://www.google.com/*"
+    "https://www.google.com/*",
+    "https://www.youtube.com/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "https://www.google.com/search*"
+        "https://www.google.com/search*",
+        "https://www.youtube.com/watch*"
       ],
       "js": [
         "content.js"

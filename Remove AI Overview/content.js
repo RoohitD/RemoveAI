@@ -1,5 +1,4 @@
 function removeAIOverview() {
-
     const aiOverview = document.querySelector("div.YzCcne h1.VW3apb");
 
     if (aiOverview && aiOverview.textContent === "AI Overview") {
@@ -11,11 +10,25 @@ function removeAIOverview() {
     }
 }
 
-// Observe DOM changes to dynamically remove the AI Overview section as it loads
+function removeVideoSummaries() {
+    const headerDiv = document.querySelector('div#header.style-scope.ytd-expandable-metadata-renderer');
+    if (headerDiv) {
+        headerDiv.remove(); // Remove the element from the DOM
+        console.log('Header div removed successfully.');
+    } else {
+        console.log('Header div not found.');
+    }
+}
+
+// Listen for changes in the DOM to handle dynamically loaded content
 const observer = new MutationObserver(() => {
-    chrome.storage.sync.get("enabled", (data) => {
-        if (data.enabled) {
+    // Ensure that storage data is retrieved before executing functions
+    chrome.storage.sync.get(["enabledGoogle", "enabledYouTube"], (data) => {
+        if (data.enabledGoogle) {
             removeAIOverview();
+        }
+        if (data.enabledYouTube) {
+            removeVideoSummaries();
         }
     });
 });
@@ -26,10 +39,12 @@ observer.observe(document.body, {
     subtree: true
 });
 
-// Initial check in case the section is already loaded
-chrome.storage.sync.get("enabled", (data) => {
-    if (data.enabled) {
+// Initial check to handle elements already loaded when the script runs
+chrome.storage.sync.get(["enabledGoogle", "enabledYouTube"], (data) => {
+    if (data.enabledGoogle) {
         removeAIOverview();
     }
-})
-
+    if (data.enabledYouTube) {
+        removeVideoSummaries();
+    }
+});
